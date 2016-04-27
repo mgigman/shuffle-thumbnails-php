@@ -1,0 +1,53 @@
+ <?php
+		$id_array = array();
+		if(mysqli_num_rows($result) >= 1){
+        while($members = mysqli_fetch_assoc($result)) {
+			$id_array[] = $members["member_id"];
+			} // end while
+		}// end if
+		
+			//$count_ids = count($id_array);
+			//print_r($id_array);
+			// this shuffles members around so no one is first all the time
+			shuffle($id_array);
+			//foreach ($id_array as $mem_id) {
+    		//echo "$mem_id ";
+			//}
+			//echo "<br>";
+		foreach($id_array as $id) {
+		$query = "SELECT intro_family_url, quote, member_id, public_phone FROM family_main WHERE member_id = {$id} LIMIT 1";
+		$result = mysqli_query($connection, $query);
+		// Test if there was a query error
+		confirm_query($result);
+
+		if(mysqli_num_rows($result) == 1){
+        while($main = mysqli_fetch_assoc($result)) {
+            //put results into a variable
+			$intro_family_url = $main["intro_family_url"];
+			//$intro_photo_array[] = $intro_family_url;
+			$quote = $main["quote"];
+			//$member_id = $main["member_id"];
+			$public_phone = $main["public_phone"];
+		?>
+        <div class="col-xs-6 col-sm-4 col-md-3">
+            <p><a href="family_main.php?id=<?php echo htmlentities($id); ?>" id="<?php echo htmlentities($id); ?>"><img src="<?php echo $intro_family_url; ?>" alt="main Adoptive family photo " height="167" class="img-responsive img-thumbnail img-rounded"></a></p>
+          <h1><?php
+		  	$query2 = "SELECT display_name FROM members WHERE id = {$id} LIMIT 1";
+			$result2 = mysqli_query($connection, $query2);
+			confirm_query($result2);
+			$members = mysqli_fetch_assoc($result2);
+			// put into a varialbe
+			$display_name = $members["display_name"];
+		  	echo $display_name;
+		  ?></h1>
+            <p>"<?php echo $quote; ?>"</p>
+            <p><a class="various" data-fancybox-type="iframe" href="quickfacts.php?id=<?php echo htmlentities($id); ?>">Quick Facts >></a></p>
+             <h2><?php if (isset($public_phone)) {echo $public_phone; } ?></h2>
+        </div>
+        <?php
+				} // end if
+				mysqli_free_result($result);
+			} // end while
+		} // end for each
+		mysqli_free_result($result2);
+		?>
